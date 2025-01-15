@@ -1,0 +1,9 @@
+{
+  "name": "bingo-game",
+  "version": "1.0.0",
+  "description": "Bingo Game Application",
+  "scripts": {
+    "dev": "python app.py"
+  },
+  "dependencies": {}
+} 
