@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-center mb-4 text-blue-800">
+            Custom Game Board
+        </h1>
+        <p class="text-gray-600 mb-4">Select 8 numbers to play</p>
+    </div>
+
+    <!-- Game Board -->
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <!-- Numbers Grid -->
+            <div class="grid grid-cols-8 gap-2">
+                <!-- Numbers 1-40 in groups of 5 -->
+                <!-- Column 1: 1-5 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">1-5</div>
+                    {% for i in range(1, 6) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 2: 6-10 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">6-10</div>
+                    {% for i in range(6, 11) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 3: 11-15 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">11-15</div>
+                    {% for i in range(11, 16) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 4: 16-20 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">16-20</div>
+                    {% for i in range(16, 21) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 5: 21-25 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">21-25</div>
+                    {% for i in range(21, 26) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 6: 26-30 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">26-30</div>
+                    {% for i in range(26, 31) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 7: 31-35 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">31-35</div>
+                    {% for i in range(31, 36) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Column 8: 36-40 -->
+                <div class="space-y-2">
+                    <div class="text-sm font-bold text-gray-500 text-center">36-40</div>
+                    {% for i in range(36, 41) %}
+                    <div class="border border-gray-300 p-2 text-center text-lg font-bold hover:bg-gray-50 cursor-pointer" onclick="toggleCell(this)">{{ i }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="flex justify-center gap-4 mt-8">
+        <button onclick="playGame()" 
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg">
+            Play Game
+        </button>
+        <button onclick="resetBoard()" 
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+            Reset
+        </button>
+        <div class="text-gray-600 ml-4">
+            Selected: <span id="selected-count">0</span>/8
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results" class="mt-8 hidden">
+        <h2 class="text-2xl font-bold text-center mb-4">Lottery Results</h2>
+        <div id="result-message" class="text-xl text-center mb-4 text-blue-600"></div>
+        <div class="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
+            <div class="font-bold text-gray-700">Column</div>
+            <div class="font-bold text-red-600">Winning Number</div>
+            <div class="font-bold text-blue-600">Your Number</div>
+            <div class="font-bold text-green-600">Result</div>
+        </div>
+        <div id="results-grid" class="grid grid-cols-4 gap-4 max-w-2xl mx-auto mt-2 text-lg">
+        </div>
+        <div id="total-points" class="text-center mt-6 text-2xl font-bold text-purple-600"></div>
+    </div>
+</div>
+
+<script>
+function toggleCell(cell) {
+    const selectedCells = document.querySelectorAll('.bg-blue-200').length;
+    const column = cell.parentElement;
+    const columnIndex = Array.from(column.parentElement.children).indexOf(column);
+    
+    if (cell.classList.contains('bg-blue-200')) {
+        cell.classList.toggle('bg-blue-200');
+    } else {
+        // Check if column already has a selection
+        const columnCells = column.querySelectorAll('.border.border-gray-300');
+        const hasSelection = Array.from(columnCells).some(cell => cell.classList.contains('bg-blue-200'));
+        
+        if (!hasSelection) {
+            cell.classList.toggle('bg-blue-200');
+        } else {
+            alert('You can only select one number from each column');
+        }
+    }
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const selectedCells = document.querySelectorAll('.bg-blue-200').length;
+    document.getElementById('selected-count').textContent = selectedCells;
+}
+
+function resetBoard() {
+    document.querySelectorAll('.border.border-gray-300').forEach(cell => {
+        cell.classList.remove('bg-blue-200');
+    });
+    updateSelectedCount();
+    document.getElementById('results').classList.add('hidden');
+}
+
+async function playGame() {
+    const selectedCells = document.querySelectorAll('.bg-blue-200');
+    if (selectedCells.length !== 8) {
+        alert('Please select one number from each column');
+        return;
+    }
+    
+    const numbers = Array.from(selectedCells).map(cell => parseInt(cell.textContent));
+    
+    try {
+        const response = await fetch('/play', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ numbers: numbers })
+        });
+        
+        const data = await response.json();
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        
+        showResults(data);
+    } catch (error) {
+        alert('Error playing game: ' + error);
+    }
+}
+
+function showResults(data) {
+    const resultsDiv = document.getElementById('results');
+    const resultsGrid = document.getElementById('results-grid');
+    const pointsDiv = document.getElementById('total-points');
+    const messageDiv = document.getElementById('result-message');
+    
+    resultsGrid.innerHTML = '';
+    data.matches.forEach((match, index) => {
+        const range = document.querySelectorAll('.text-sm.font-bold')[index].textContent;
+        resultsGrid.innerHTML += `
+            <div class="text-gray-700">${range}</div>
+            <div class="text-red-600 font-bold">${match.lottery}</div>
+            <div class="text-blue-600 font-bold">${match.user}</div>
+            <div class="text-center">${match.match ? 
+                '<span class="text-green-600 text-2xl">✔️</span>' : 
+                '<span class="text-red-500 text-xl">✗</span>'}
+            </div>
+        `;
+    });
+    
+    pointsDiv.textContent = `Matches: ${data.points} out of 8`;
+    messageDiv.textContent = data.message;
+    resultsDiv.classList.remove('hidden');
+    
+    // Scroll to results section smoothly
+    resultsDiv.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+</script>
+{% endblock %} 
